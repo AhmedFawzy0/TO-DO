@@ -1,0 +1,20 @@
+<head>
+  <link rel="stylesheet" href="taskStyle.css">
+</head>
+
+
+<body>
+<div id="myDIV" class="header">
+    <h2>My To Do List <label onclick="signOutFunc()" class="signOut">Sign out</label></h2>
+    <input type="text" id="myInput" placeholder="Tasks...">
+    <span onclick="newElement()" class="addBtn">Add</span>
+  </div>
+  
+  <ul id="myUL">
+      {{range .}}
+      <li data="{{.Finished}}" data-id="{{.ID}}">{{.Detail}}</li>
+        {{end}}
+  </ul>
+
+  <script src="taskScript.js"></script>
+</body>
