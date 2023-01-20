@@ -8,13 +8,13 @@ import (
 func setupRoutes(app *fiber.App) {
 
 	app.Get("/", handlers.ListUsers)
-	app.Get("/logIn", handlers.LogInLogic)
+	app.Post("/logIn", handlers.LogInLogic)
 	app.Post("/user", handlers.CreateUser)
 	app.Get("/taskPage", handlers.HandleTaskPage)
 	app.Post("/addTask", handlers.AddTask)
 	app.Get("/signOut", handlers.SignOut)
 	app.Post("/addTask", handlers.AddTask)
-	app.Delete("/deleteTask", handlers.DeleteTask)
-	app.Put("/updateTask", handlers.UpdateTask)
+	app.Post("/deleteTask", handlers.DeleteTask)
+	app.Post("/updateTask", handlers.UpdateTask)
 
 }

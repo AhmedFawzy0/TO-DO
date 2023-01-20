@@ -1,52 +1,54 @@
 package handlers
 
 import (
+	"errors"
+	"fmt"
+	"sort"
 	"strconv"
-	 "github.com/gofiber/fiber/v2"
-	 "github.com/AhmedFawzy0/TO-DO/models"
-	 "github.com/AhmedFawzy0/TO-DO/database"
-	 "github.com/golang-jwt/jwt/v4"
-	 "time"
-	 "sort"
-	 "fmt"
+	"time"
+
+	"github.com/AhmedFawzy0/TO-DO/database"
+	"github.com/AhmedFawzy0/TO-DO/models"
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
+	"gorm.io/gorm"
 )
 
 var current_data []models.User
-var LogInType string ="-2"//-2 means nothing, -1 means account doesn't exist, 0 exists but means wrong password
-var newReload bool=true
-var regLoad bool=false
+var LogInType string = "-2" //-2 means nothing, -1 means account doesn't exist, 0 exists but means wrong password
+var newReload bool = true
+var regLoad bool = false
 var current_user *models.User
-var userExists bool=false
-const SecretKey= "secret" 
-var userLoggedIn models.User
+var userExists bool = false
 
+const SecretKey = "secret"
+
+var userLoggedIn models.User
 
 func ListUsers(c *fiber.Ctx) error {
 
-
 	users := []models.User{}
 	database.DB.Db.Find(&users)
-	current_data=users
+	current_data = users
 
-	if newReload==true {
-	LogInType="-2"
-	return c.Render("mainPage",fiber.Map{"LogInType": LogInType,})
+	if newReload == true {
+		LogInType = "-2"
+		return c.Render("mainPage", fiber.Map{"LogInType": LogInType})
 	} else {
-		newReload=true
-		var userExistTemp bool=userExists
-		var regLoadTemp bool=regLoad
-		userExists=false
-		return c.Render("mainPage",fiber.Map{
-		"LogInType": LogInType,
-		"usernameInput": current_user.Username,
-		"passwordInput": current_user.Password,
-		"userExists": strconv.FormatBool(userExistTemp),
-		"regLoad": strconv.FormatBool(regLoadTemp),
-	 	})
-
+		newReload = true
+		var userExistTemp bool = userExists
+		var regLoadTemp bool = regLoad
+		userExists = false
+		return c.Render("mainPage", fiber.Map{
+			"LogInType":     LogInType,
+			"usernameInput": current_user.Username,
+			"passwordInput": current_user.Password,
+			"userExists":    strconv.FormatBool(userExistTemp),
+			"regLoad":       strconv.FormatBool(regLoadTemp),
+		})
 
 	}
-	
+
 }
 
 func CreateUser(c *fiber.Ctx) error {
@@ -57,21 +59,22 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 	for i := 0; i < len(current_data); i++ {
-		if current_data[i].Username==user.Username{
-			userExists=true
+		if current_data[i].Username == user.Username {
+			userExists = true
 		}
 	}
 
-
-	if !userExists{database.DB.Db.Create(&user)}
-	current_user=user
-	regLoad=true
-	newReload=false
+	if !userExists {
+		database.DB.Db.Create(&user)
+	}
+	current_user = user
+	regLoad = true
+	newReload = false
 	return c.Redirect("/")
 }
 
 func LogInLogic(c *fiber.Ctx) error {
-	LogInType="-1"
+	LogInType = "-1"
 
 	user1 := new(models.User)
 	if err := c.BodyParser(user1); err != nil {
@@ -80,20 +83,20 @@ func LogInLogic(c *fiber.Ctx) error {
 		})
 	}
 
-for i := 0; i < len(current_data); i++ {
-	if current_data[i].Username==user1.Username{
-		
-			LogInType="0"
-			if current_data[i].Password==user1.Password{
-				
-				LogInType="-2"
-				userLoggedIn=current_data[i]
+	for i := 0; i < len(current_data); i++ {
+		if current_data[i].Username == user1.Username {
+
+			LogInType = "0"
+			if current_data[i].Password == user1.Password {
+
+				LogInType = "-2"
+				userLoggedIn = current_data[i]
 
 				claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 					Issuer:    user1.Username,
 					ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
 				})
-			
+
 				token, err := claims.SignedString([]byte(SecretKey))
 
 				if err != nil {
@@ -102,7 +105,7 @@ for i := 0; i < len(current_data); i++ {
 						"message": "could not login",
 					})
 				}
-			
+
 				cookie := fiber.Cookie{
 					Name:     "jwt",
 					Value:    token,
@@ -115,15 +118,15 @@ for i := 0; i < len(current_data); i++ {
 			}
 
 		}
+	}
+
+	newReload = false
+	regLoad = false
+	current_user = user1
+	return c.Redirect("/")
 }
 
-newReload=false
-regLoad=false
-current_user=user1
-return c.Redirect("/")
-}
-
-func HandleTaskPage(c *fiber.Ctx) error{
+func HandleTaskPage(c *fiber.Ctx) error {
 
 	cookie := c.Cookies("jwt")
 
@@ -137,20 +140,21 @@ func HandleTaskPage(c *fiber.Ctx) error{
 	}
 
 	claims := token.Claims.(*jwt.StandardClaims)
-	if(claims.Issuer!=userLoggedIn.Username) {return c.SendString("Unauthenticated, please Sign In!")}
+	if claims.Issuer != userLoggedIn.Username {
+		return c.SendString("Unauthenticated, please Sign In!")
+	}
 
 	var UserTasks []models.Task
 	database.DB.Db.Model(&userLoggedIn).Association("Tasks").Find(&UserTasks)
 
 	sort.Slice(UserTasks, func(i, j int) bool {
 		return UserTasks[i].ID < UserTasks[j].ID
-	  })
+	})
 
-	return c.Render("taskPage",UserTasks)
+	return c.Render("taskPage", UserTasks)
 }
 
-
-func SignOut(c * fiber.Ctx) error{
+func SignOut(c *fiber.Ctx) error {
 
 	cookie := fiber.Cookie{
 		Name:     "jwt",
@@ -164,7 +168,7 @@ func SignOut(c * fiber.Ctx) error{
 	return c.Redirect("/")
 }
 
-func AddTask(c *fiber.Ctx) error{
+func AddTask(c *fiber.Ctx) error {
 
 	task_new := new(models.Task)
 	if err := c.BodyParser(task_new); err != nil {
@@ -172,7 +176,6 @@ func AddTask(c *fiber.Ctx) error{
 			"message": err.Error(),
 		})
 	}
-
 
 	database.DB.Db.Model(&userLoggedIn).Association("Tasks").Append(task_new)
 	fmt.Println(userLoggedIn.ID)
@@ -182,11 +185,11 @@ func AddTask(c *fiber.Ctx) error{
 
 	return c.JSON(fiber.Map{
 		"success": true,
-		"Task": task_new,
+		"Task":    task_new,
 	})
 }
 
-func DeleteTask (c *fiber.Ctx) error{
+func DeleteTask(c *fiber.Ctx) error {
 
 	task_del := new(models.Task)
 	if err := c.BodyParser(task_del); err != nil {
@@ -196,28 +199,28 @@ func DeleteTask (c *fiber.Ctx) error{
 	}
 
 	var task_temp models.Task
-	database.DB.Db.Delete(&task_temp, task_del.ID)
+	error := database.DB.Db.Delete(&task_temp, task_del.ID).Error
+	if errors.Is(error, gorm.ErrRecordNotFound) {
+		return errors.New("task not found")
+	}
 
-	
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"deleted": true,  
+		"deleted": true,
 	})
 
 }
 
-func UpdateTask(c *fiber.Ctx) error{
+func UpdateTask(c *fiber.Ctx) error {
 	task_up := new(models.Task)
 	if err := c.BodyParser(task_up); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
-	database.DB.Db.Model(&task_up).Select("Finished","Detail").Where("id = ?", task_up.ID).Updates(models.Task{Finished:!task_up.Finished, Detail: task_up.Detail})
+	database.DB.Db.Model(&task_up).Select("Finished", "Detail").Where("id = ?", task_up.ID).Updates(models.Task{Finished: !task_up.Finished, Detail: task_up.Detail})
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"updated": true,  
+		"updated": true,
 	})
 
 }
-
-
