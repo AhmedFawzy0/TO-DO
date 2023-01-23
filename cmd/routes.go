@@ -13,8 +13,7 @@ func setupRoutes(app *fiber.App) {
 	app.Get("/taskPage", handlers.HandleTaskPage)
 	app.Post("/addTask", handlers.AddTask)
 	app.Get("/signOut", handlers.SignOut)
-	app.Post("/addTask", handlers.AddTask)
-	app.Post("/deleteTask", handlers.DeleteTask)
-	app.Post("/updateTask", handlers.UpdateTask)
+	app.Delete("/deleteTask", handlers.DeleteTask)
+	app.Put("/updateTask", handlers.UpdateTask)
 
 }
