@@ -12,5 +12,6 @@ The backend has functions that deal with the user's commands using the GO fiber 
 - Clone the repository
 - Run 
 ```"docker compose build"``` followed by ```"docker compose up" ```
+- The app should now be hosted at ```localhost:3000```
 
 Thats it!
