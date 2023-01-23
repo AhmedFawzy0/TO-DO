@@ -38,7 +38,7 @@ for (i = 0; i < close.length; i++) {
     div.remove();
 
     fetch('/deleteTask', {
-      method: 'POST',
+      method: 'Delete',
       headers: {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ list.addEventListener('click', function(ev) {
     else ev.target.setAttribute("data","false");
  
   fetch('/updateTask', {
-    method: 'POST',
+    method: 'put',
     headers: {
       'Accept': 'application/json, text/plain, */*',
       'Content-Type': 'application/json'
