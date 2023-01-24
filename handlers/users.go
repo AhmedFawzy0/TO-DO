@@ -199,6 +199,8 @@ func DeleteTask(c *fiber.Ctx) error {
 	}
 
 	var task_temp models.Task
+	
+//change below done before
 	error := database.DB.Db.Delete(&task_temp, task_del.ID).Error
 	if errors.Is(error, gorm.ErrRecordNotFound) {
 		return errors.New("task not found")
