@@ -100,7 +100,20 @@ function newElement() {
   for (i = 0; i < close.length; i++) {
     close[i].onclick = function() {
       var div = this.parentElement;
-      div.style.display = "none";
+      var finish_now=div.getAttribute("data")=="false"?false:true;
+      var detail_now=div.innerText.slice(0, -2); 
+      div.remove();
+      
+      fetch('/deleteTask', {
+        method: 'Delete',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ID:parseInt(div.getAttribute("data-id")) ,Finished: finish_now, Detail: detail_now})
+      }).catch(e => {
+          console.log(e);
+      });
     }
   }
 if(!empty){
