@@ -92,6 +92,16 @@ func LogInLogic(c *fiber.Ctx) error {
 				LogInType = "-2"
 				userLoggedIn = current_data[i]
 
+				//redis store
+				sess, err := database.Store.Get(c)
+				if err != nil {
+					panic(err)
+				}
+				sess.Set("username", user1.Username)
+				if err := sess.Save(); err != nil {
+					panic(err)
+				}
+
 				claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 					Issuer:    user1.Username,
 					ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
@@ -128,7 +138,16 @@ func LogInLogic(c *fiber.Ctx) error {
 
 func HandleTaskPage(c *fiber.Ctx) error {
 
-	cookie := c.Cookies("jwt")
+	sess, err := database.Store.Get(c) //redis authentication
+				if err != nil {
+					panic(err)
+				}
+	name := sess.Get("username")
+	fmt.Println(name)
+	if(name!=userLoggedIn.Username){ return c.SendString("Unauthenticated, please Sign In!")}
+
+
+	cookie := c.Cookies("jwt") //below is jwt authentication (2 authentication methods are used!)
 
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
@@ -155,6 +174,15 @@ func HandleTaskPage(c *fiber.Ctx) error {
 }
 
 func SignOut(c *fiber.Ctx) error {
+
+	sess, err := database.Store.Get(c)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := sess.Destroy(); err != nil {
+		panic(err)
+	} 
 
 	cookie := fiber.Cookie{
 		Name:     "jwt",
