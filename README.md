@@ -1,10 +1,10 @@
 
 # Introduction
 
-This is a TO-DO webapp that allows users to login/register for an account and to add, delete, edit and update tasks as they wish. 
+This is a TO-DO webapp that allows users to login/register for an account and to add, delete, edit and update tasks as they wish.
 
 As the user is using the app, the javascript fetch API makes various calls to the backend codebase written in GO. 
-The backend has functions that deal with the user's commands using the GO fiber framework. Note that Gorm (an ORM library) and a Postgresql docker container are used to implement the database.
+The backend has functions that deal with the user's commands using the GO fiber framework. Note that Gorm (an ORM library) and a Postgresql docker container are used to implement the database. As well, JWT and using sessions with redis are both used for authentication.
 
 # To get started
 
