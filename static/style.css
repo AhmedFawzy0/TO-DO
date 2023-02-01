@@ -44,35 +44,24 @@ a{
 .login-reg-panel{
     color:#B8B8B8;
 }
-.login-reg-panel #label-login, 
-.login-reg-panel #label-register{
-    border:1px solid #9E9E9E;
-    padding:5px 5px;
-    width:150px;
-    display:block;
-    text-align:center;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight: 600;
-    font-size: 18px;
-}
+
 .login-info-box{
-    width:30%;
-    padding:0 50px;
-    top:20%;
-    left:0;
-    position:absolute;
-    text-align:left;
+    max-height: 20;
+    margin-top: 2%;
+    max-width: max-content;
+    margin-left:25%;
+    float:right;
+    text-align: center;
+    width: 100%;
+    color: black;
+    border-bottom-style: dotted;
+    border-width: thin;
+    padding: 10px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    cursor: pointer;
 }
-.register-info-box{
-    width:30%;
-    padding:0 50px;
-    top:20%;
-    right:0;
-    position:absolute;
-    text-align:left;
-    
-}
+
 .right-log{right:50px !important;}
 
 .login-show, 
@@ -157,9 +146,10 @@ a{
 .error-message{
     font-size: medium;
     color: darkred;
-    max-width: 200px;
+    max-width: 375px;
     text-align: center;
-    margin-left: 25px;
+    margin-left: 10%;
+    margin-top:17%;
 }
 
 #registerSubmit:hover{
@@ -170,11 +160,28 @@ a{
     background-color: lightgray;
 }
 
-#label-register:hover{
+.login-info-box:hover{
 background-color: lightgray;
 }
 
-#label-login:hover{
+.register-info-box{
+    max-height: 20;
+    margin-top: 2%;
+    margin-left:25%;
+    border-bottom-style: dotted;
+    border-width: thin;
+    float:right;
+    text-align: center;
+    max-width: max-content;
+    width: 100%;
+    color: black;
+    padding: 10px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.register-info-box:hover{
 background-color: lightgray;
 }
 

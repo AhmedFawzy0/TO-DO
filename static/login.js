@@ -26,7 +26,7 @@
     });
     
      
-    $('.login-reg-panel input[type="radio"]').on('change', function() {
+    $('input[type="radio"][name=active-log-panel]').on('change', function() {
         $('#new-account').hide();
         $('#wrong-password').hide();
         $('#username-exists').hide();
@@ -44,6 +44,7 @@
             $('.white-panel').addClass('right-log');
             $('.register-show').addClass('show-log-panel');
             $('.login-show').removeClass('show-log-panel');
+            $('#log-login-show').prop('checked',false);
             
         }
         else if($('#log-reg-show').is(':checked')) {
@@ -54,6 +55,7 @@
             
             $('.login-show').addClass('show-log-panel');
             $('.register-show').removeClass('show-log-panel');
+            $('#log-reg-show').prop('checked',false);
         }
     });
 

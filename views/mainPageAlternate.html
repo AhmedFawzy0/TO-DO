@@ -1,0 +1,49 @@
+<!----- code from https://bootsnipp.com/snippets/92gmX alternate sign in page ----->
+<head>
+<link href=" https://cdnjs.com/libraries/bootstrap/4.6.2" rel="stylesheet" id="bootstrap-css">
+<script src=" https://cdnjs.com/libraries/bootstrap/4.6.2"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<!------ Include the above in your HEAD tag ---------->
+<body>
+<div class="login-reg-panel" data="{{.regLoad}}">
+		<div class="login-info-box">
+			<h2>Have an account?</h2>
+			<label id="label-register" for="log-reg-show">Login</label>
+			<input type="radio" name="active-log-panel" id="log-reg-show"  checked="checked">
+		</div>
+							
+		<div class="register-info-box">
+			<h2>Don't have an account?</h2>
+			<label id="label-login" for="log-login-show">Register</label>
+			<input type="radio" name="active-log-panel" id="log-login-show">
+		</div>
+							
+		<div class="white-panel">
+			<div class="login-show">
+				<h2>TO-DO APP</h2>
+                <form method="post" action="/logIn" id="loginForm">
+				<input type="text" placeholder="Username" name="username" value="{{.usernameInput}}" id="usernameId">
+				<input type="password" placeholder="Password" name="password" value="{{.passwordInput}}" id="passwordId">
+				<input type="button" onclick="logInF()" value="Login" data-userExists="{{.userExists}}" id="regSubmit"> 
+            </form>
+			</div>
+			<div class="register-show">
+				<h2>TO-DO APP</h2>
+				<form  method="post" action="/user" id="regForm">
+				<input type="text" placeholder="Username" name="username" value="{{.usernameInput}}" id="RegUsernameId">
+				<input type="password" placeholder="Password" name="password" value="{{.passwordInput}}" id="RegPasswordId">
+				<input type="button" onclick="regF()" value="Register" id="registerSubmit" data="{{.userExists}}">
+				</form>
+			</div>
+			<div id="account-created">Account Created!</div>
+			<div class="error-message"  id="username-exists">Username already exists!</div>
+			<div class="error-message" id="wrong-password" data="{{.LogInType}}">Incorrect password!</div>
+			<div class="error-message" id="new-account" data="{{.LogInType}}">Username does not exist!</div>
+			<div class="error-message" id="shortInput">Username/Password length must be between 3-30 characters!</div>
+		</div>
+	</div>
+    <script src="login.js"></script>
+</body>
+

@@ -2,19 +2,19 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/AhmedFawzy0/TO-DO/handlers"
+	"github.com/AhmedFawzy0/TO-DO/controllers"
 	
 )
 
 func setupRoutes(app *fiber.App) {
 
-	app.Get("/", handlers.ListUsers)
-	app.Post("/logIn", handlers.LogInLogic)
-	app.Post("/user", handlers.CreateUser)
-	app.Get("/taskPage", handlers.HandleTaskPage)
-	app.Post("/addTask", handlers.AddTask)
-	app.Get("/signOut", handlers.SignOut)
-	app.Delete("/deleteTask", handlers.DeleteTask)
-	app.Put("/updateTask", handlers.UpdateTask)
+	app.Get("/", controllers.ListUsers)
+	app.Post("/logIn", controllers.LogInLogic)
+	app.Post("/user", controllers.CreateUser)
+	app.Get("/taskPage", controllers.HandleTaskPage)
+	app.Post("/addTask", controllers.AddTask)
+	app.Get("/signOut", controllers.SignOut)
+	app.Delete("/deleteTask", controllers.DeleteTask)
+	app.Put("/updateTask", controllers.UpdateTask)
 
 }
