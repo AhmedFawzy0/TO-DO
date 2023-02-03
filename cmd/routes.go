@@ -8,7 +8,7 @@ import (
 
 func setupRoutes(app *fiber.App) {
 
-	app.Get("/", controllers.ListUsers)
+	app.Get("/", controllers.MainPage)
 	app.Post("/logIn", controllers.LogInLogic)
 	app.Post("/user", controllers.CreateUser)
 	app.Get("/taskPage", controllers.HandleTaskPage)

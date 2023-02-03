@@ -5,21 +5,8 @@
             $('#account-created').hide();
             $('#shortInput').hide();
             $('.white-panel').css('transition','.3s ease-in-out');
-
-            $('#wrong-password').attr('data')=='0'?$('#wrong-password').show():$('#wrong-password').hide();
-            $('#new-account').attr('data')=='-1'?$('#new-account').show():$('#new-account').hide();
-
             $('.login-info-box').fadeOut();
             $('.login-show').addClass('show-log-panel');
-
-            if($('.login-reg-panel').attr('data')=='true')
-            {
-                $('.white-panel').css('transition','0s');
-                $('#label-login').click();
-                $('#regSubmit').attr('data-userExists')=='true'? $('#username-exists').show(): $('#account-created').show();   
-            }
-
-
      
 
 
@@ -74,10 +61,19 @@
         {
             $('#shortInput').show();
         }
-
-        else{
-        $('#loginForm').submit();
-        }
+          else{
+            fetch('/logIn', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({Username: $('#usernameId').val(),Password: $('#passwordId').val()})
+            }).then(response => response.json())
+            .then(response =>!JSON.parse(JSON.stringify(response)).success? (JSON.parse(JSON.stringify(response)).UserExists?$('#wrong-password').show():$('#new-account').show()): window.location.href = "/taskPage"
+                  );
+          }
+        
       }
 
       function regF(){
@@ -88,7 +84,16 @@
         }
 
         else{
-            $('#regForm').submit();
+          fetch('/user', {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json, text/plain, */*',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({Username: $('#RegUsernameId').val(),Password:$('#RegPasswordId').val() })
+          }).then(response => response.json())
+          .then(response => JSON.parse(JSON.stringify(response)).UserCreated?$('#account-created').show():$('#username-exists').show()
+                );
         }
         
       }
