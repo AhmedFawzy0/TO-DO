@@ -14,7 +14,7 @@ function changeTask(element) {
   let change = prompt("Change the task:", element.parentElement.getElementsByClassName("taskText")[0].innerText);
   if (change != null && change != "") {
     element.parentElement.getElementsByClassName("taskText")[0].innerText=change;
-    let finish=element.parentElement.getAttribute("data")==false?true:false;//update function flips it
+    let finish=element.parentElement.getAttribute("data")==='false';//update function flips it
     let id=element.parentElement.getAttribute("data-id")
 
     fetch('/updateTask', {
@@ -95,7 +95,7 @@ for (i = 0; i < close.length; i++) {
 var list = document.querySelector('ul');
 list.addEventListener('click', function(ev) {
   var finish_cur=ev.target.getAttribute("data")=="true"?true:false;
-  if (ev.target.tagName === 'LI' && this.getAttribute("edit")!="edit") {
+  if (ev.target.tagName === 'LI' && this.getAttribute("class")!="edit") {
     ev.target.classList.toggle('checked');
     if(ev.target.getAttribute("data")=="false")
       ev.target.setAttribute("data","true");
