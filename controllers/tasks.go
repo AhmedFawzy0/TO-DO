@@ -3,37 +3,36 @@ package controllers
 import (
 	"errors"
 	//"fmt"
-	"sort"
+	//"sort"
 	//"strconv"
 	//"time"
 	"github.com/AhmedFawzy0/TO-DO/database"
 	"github.com/AhmedFawzy0/TO-DO/models"
+	"github.com/AhmedFawzy0/TO-DO/repos"
 	"github.com/gofiber/fiber/v2"
+
 	//"github.com/golang-jwt/jwt/v4"
 	"gorm.io/gorm"
 )
 
-
-
 func HandleTaskPage(c *fiber.Ctx) error {
 
 	sess, err := database.Store.Get(c) //redis authentication
-				if err != nil {
-					panic(err)
-				}
+	if err != nil {
+		panic(err)
+	}
 	name := sess.Get("username")
-	if(name==nil){ return c.SendString("Unauthenticated, please Sign In!")}
-	
-	userLoggedIn:=new(models.User)
+	if name == nil {
+		return c.SendString("Unauthenticated, please Sign In!")
+	}
+
+	userLoggedIn := new(models.User)
 	database.DB.Db.Where("Username = ?", name).First(&userLoggedIn)
 
 	var UserTasks []models.Task
 	database.DB.Db.Model(&userLoggedIn).Association("Tasks").Find(&UserTasks)
-	
 
-	sort.Slice(UserTasks, func(i, j int) bool {
-		return UserTasks[i].ID < UserTasks[j].ID
-	})
+	UserTasks = repos.SortById(UserTasks)
 
 	return c.Render("taskPage", UserTasks)
 }
@@ -47,7 +46,7 @@ func SignOut(c *fiber.Ctx) error {
 
 	if err := sess.Destroy(); err != nil {
 		panic(err)
-	} 
+	}
 
 	return c.Redirect("/")
 }
@@ -62,13 +61,15 @@ func AddTask(c *fiber.Ctx) error {
 	}
 
 	sess, err := database.Store.Get(c) //redis authentication
-				if err != nil {
-					panic(err)
-				}
+	if err != nil {
+		panic(err)
+	}
 	name := sess.Get("username")
-	if(name==nil){ return c.SendString("Unauthenticated, please Sign In!")}
-	
-	userLoggedIn:=new(models.User)
+	if name == nil {
+		return c.SendString("Unauthenticated, please Sign In!")
+	}
+
+	userLoggedIn := new(models.User)
 	database.DB.Db.Where("Username = ?", name).First(&userLoggedIn)
 
 	database.DB.Db.Model(&userLoggedIn).Association("Tasks").Append(task_new)
@@ -91,16 +92,17 @@ func DeleteTask(c *fiber.Ctx) error {
 		})
 	}
 
-
 	sess, err := database.Store.Get(c) //redis authentication
-				if err != nil {
-					panic(err)
-				}
+	if err != nil {
+		panic(err)
+	}
 	name := sess.Get("username")
-	if(name==nil){ return c.SendString("Unauthenticated, please Sign In!")}
-	
+	if name == nil {
+		return c.SendString("Unauthenticated, please Sign In!")
+	}
+
 	var task_temp models.Task
-	
+
 	error := database.DB.Db.Delete(&task_temp, task_del.ID).Error
 	if errors.Is(error, gorm.ErrRecordNotFound) {
 		return errors.New("task not found")
@@ -123,8 +125,10 @@ func UpdateTask(c *fiber.Ctx) error {
 	if err != nil {
 		panic(err)
 	}
-name := sess.Get("username")
-if(name==nil){ return c.SendString("Unauthenticated, please Sign In!")}
+	name := sess.Get("username")
+	if name == nil {
+		return c.SendString("Unauthenticated, please Sign In!")
+	}
 
 	database.DB.Db.Model(&task_up).Select("Finished", "Detail").Where("id = ?", task_up.ID).Updates(models.Task{Finished: !task_up.Finished, Detail: task_up.Detail})
 

@@ -3,14 +3,13 @@ package controllers
 import (
 	"github.com/AhmedFawzy0/TO-DO/database"
 	"github.com/AhmedFawzy0/TO-DO/models"
+	"github.com/AhmedFawzy0/TO-DO/repos"
 	"github.com/gofiber/fiber/v2"
 	//"github.com/golang-jwt/jwt/v4"
 )
 
-const SecretKey = "secret"
-
 func MainPage(c *fiber.Ctx) error {
-		return c.Render("mainPage",nil)
+	return c.Render("mainPage", nil)
 }
 
 func CreateUser(c *fiber.Ctx) error {
@@ -20,32 +19,31 @@ func CreateUser(c *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-	
-	userTemp:= new(models.User)
-	database.DB.Db.Where("Username = ?", user.Username).First(&userTemp)
-	if(userTemp.Username==user.Username){
+
+	userTemp := new(models.User)
+	repos.FindUser(userTemp, user.Username, database.DB.Db)
+	if userTemp.Username == user.Username {
 		return c.JSON(fiber.Map{
-			"UserExists": true,
+			"UserExists":  true,
 			"UserCreated": false,
 		})
-	}else{
-		userTemp.Username=user.Username
-		userTemp.Password=user.Password
-		err:=database.DB.Db.Create(&userTemp).Error
-		if err!=nil{
+	} else {
+		userTemp.Username = user.Username
+		userTemp.Password = user.Password
+		_, err := repos.CreateUser(userTemp.Username, userTemp.Password, database.DB.Db)
+		if err != nil {
 			return c.JSON(fiber.Map{
-				"UserExists": true,
-			    "UserCreated": false,
+				"UserExists":  true,
+				"UserCreated": false,
 			})
-			}
+		}
 
 		return c.JSON(fiber.Map{
-			"UserExists": false,
+			"UserExists":  false,
 			"UserCreated": true,
 		})
 	}
 
-		
 }
 
 func LogInLogic(c *fiber.Ctx) error {
@@ -57,27 +55,26 @@ func LogInLogic(c *fiber.Ctx) error {
 		})
 	}
 
+	userTemp := new(models.User)
+	repos.FindUser(userTemp, user1.Username, database.DB.Db)
+	//database.DB.Db.Where("Username = ?", user1.Username).First(&userTemp)
 
-	userTemp:= new(models.User)
-	database.DB.Db.Where("Username = ?", user1.Username).First(&userTemp)
+	if repos.LoginAuthorize(userTemp, user1) {
+		sess, err := database.Store.Get(c)
+		if err != nil {
+			panic(err)
+		}
+		sess.Set("username", user1.Username)
+		if err := sess.Save(); err != nil {
+			panic(err)
+		}
 
-	if(userTemp.Username==user1.Username && userTemp.Password==user1.Password){
-			sess, err := database.Store.Get(c)
-			if err != nil {
-				panic(err)}
-			sess.Set("username", user1.Username)
-			if err := sess.Save(); err != nil {
-				panic(err)}	
-
-				return c.JSON(fiber.Map{
-					"success":true,
-					"UserExists":true,})
-	}else{
 		return c.JSON(fiber.Map{
-			"success":false,
-			"UserExists":userTemp.Username==user1.Username,})
+			"success":    true,
+			"UserExists": true})
+	} else {
+		return c.JSON(fiber.Map{
+			"success":    false,
+			"UserExists": userTemp.Username == user1.Username})
 	}
-	}
-
-
-
+}
