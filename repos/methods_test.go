@@ -91,6 +91,35 @@ func (s *RepoTestSuite) TestFindUserEmpty() {
 
 }
 
+func (s *RepoTestSuite) TestFindExistingUser() {
+	repo := NewRepo(s.db)
+
+	username_create := "user"
+	password_create := "password"
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectQuery("INSERT INTO \"users\" \\(\"created_at\",\"updated_at\",\"deleted_at\",\"username\",\"password\"\\) VALUES \\(\\$1,\\$2,\\$3,\\$4,\\$5\\) RETURNING \"id\",\"username\",\"password\"").
+		WithArgs(anyTime{}, anyTime{}, nil, username_create, password_create).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	s.mock.ExpectCommit()
+
+	user_find := "user"
+	user_found := &models.User{}
+	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE Username = $1 AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1`)).
+		WithArgs(user_find).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
+	user_created, err_created := CreateUser(username_create, password_create, repo.db)
+	err_find := FindUser(user_found, user_find, repo.db)
+
+	s.NoError(err_find)
+	s.NoError(err_created)
+	s.Equal(username_create, user_created.Username)
+	s.Equal(password_create, user_created.Password)
+	s.NoError(s.mock.ExpectationsWereMet())
+
+}
+
 func TestRepoTestSuite(t *testing.T) {
 	suite.Run(t, new(RepoTestSuite))
 }

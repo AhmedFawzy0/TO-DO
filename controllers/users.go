@@ -57,7 +57,6 @@ func LogInLogic(c *fiber.Ctx) error {
 
 	userTemp := new(models.User)
 	repos.FindUser(userTemp, user1.Username, database.DB.Db)
-	//database.DB.Db.Where("Username = ?", user1.Username).First(&userTemp)
 
 	if repos.LoginAuthorize(userTemp, user1) {
 		sess, err := database.Store.Get(c)
