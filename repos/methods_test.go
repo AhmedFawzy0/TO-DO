@@ -3,9 +3,6 @@ package repos
 import (
 	"database/sql"
 	"database/sql/driver"
-
-	//"fmt"
-
 	"regexp"
 	"testing"
 	"time"
