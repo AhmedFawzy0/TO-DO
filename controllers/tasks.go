@@ -2,22 +2,17 @@ package controllers
 
 import (
 	"errors"
-	//"fmt"
-	//"sort"
-	//"strconv"
-	//"time"
+
 	"github.com/AhmedFawzy0/TO-DO/database"
 	"github.com/AhmedFawzy0/TO-DO/models"
 	"github.com/AhmedFawzy0/TO-DO/repos"
 	"github.com/gofiber/fiber/v2"
-
-	//"github.com/golang-jwt/jwt/v4"
 	"gorm.io/gorm"
 )
 
 func HandleTaskPage(c *fiber.Ctx) error {
 
-	sess, err := database.Store.Get(c) //redis authentication
+	sess, err := database.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}
@@ -27,10 +22,10 @@ func HandleTaskPage(c *fiber.Ctx) error {
 	}
 
 	userLoggedIn := new(models.User)
-	database.DB.Db.Where("Username = ?", name).First(&userLoggedIn)
+	repos.FindUser(userLoggedIn, name.(string), database.DB.Db)
 
 	var UserTasks []models.Task
-	database.DB.Db.Model(&userLoggedIn).Association("Tasks").Find(&UserTasks)
+	repos.FindUserTasks(userLoggedIn, &UserTasks, database.DB.Db)
 
 	UserTasks = repos.SortById(UserTasks)
 
@@ -60,7 +55,7 @@ func AddTask(c *fiber.Ctx) error {
 		})
 	}
 
-	sess, err := database.Store.Get(c) //redis authentication
+	sess, err := database.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}
@@ -70,12 +65,10 @@ func AddTask(c *fiber.Ctx) error {
 	}
 
 	userLoggedIn := new(models.User)
-	database.DB.Db.Where("Username = ?", name).First(&userLoggedIn)
 
-	database.DB.Db.Model(&userLoggedIn).Association("Tasks").Append(task_new)
+	repos.FindUser(userLoggedIn, name.(string), database.DB.Db)
 
-	var task_temp = []models.Task{}
-	database.DB.Db.Model(&userLoggedIn).Association("Tasks").Find(&task_temp)
+	repos.AddTask(userLoggedIn, task_new, database.DB.Db)
 
 	return c.JSON(fiber.Map{
 		"success": true,
@@ -92,7 +85,7 @@ func DeleteTask(c *fiber.Ctx) error {
 		})
 	}
 
-	sess, err := database.Store.Get(c) //redis authentication
+	sess, err := database.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +114,7 @@ func UpdateTask(c *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-	sess, err := database.Store.Get(c) //redis authentication
+	sess, err := database.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}

@@ -120,6 +120,21 @@ func (s *RepoTestSuite) TestFindExistingUser() {
 
 }
 
+func (s *RepoTestSuite) TestFindEmptyTasks() {
+	repo := NewRepo(s.db)
+	user_test := &models.User{Username: "user", Password: "password"}
+	user_test.ID = 1
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "tasks" WHERE "tasks"."user_id" = $1 AND "tasks"."deleted_at" IS NULL`)).
+		WithArgs(user_test.ID).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
+	task_find := new([]models.Task)
+	err := FindUserTasks(user_test, task_find, repo.db)
+	s.NoError(err)
+	s.NoError(s.mock.ExpectationsWereMet())
+}
+
 func TestRepoTestSuite(t *testing.T) {
 	suite.Run(t, new(RepoTestSuite))
 }
