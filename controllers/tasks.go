@@ -99,7 +99,8 @@ func DeleteTask(c *fiber.Ctx) error {
 
 	var task_temp models.Task
 
-	error := database.DB.Db.Delete(&task_temp, task_del.ID).Error
+	error := repos.TaskDelete(&task_temp, task_del.ID, database.DB.Db)
+
 	if errors.Is(error, gorm.ErrRecordNotFound) {
 		return errors.New("task not found")
 	}
@@ -129,11 +130,14 @@ func UpdateTask(c *fiber.Ctx) error {
 	if name == nil {
 		return c.SendString("Unauthenticated, please Sign In!")
 	}
+	update := true
 
-	database.DB.Db.Model(&task_up).Select("Finished", "Detail").Where("id = ?", task_up.ID).Updates(models.Task{Finished: !task_up.Finished, Detail: task_up.Detail})
+	if repos.UpdateTask(task_up, database.DB.Db) != nil {
+		update = false
+	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"updated": true,
+		"updated": update,
 	})
 
 }
