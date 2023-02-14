@@ -24,12 +24,10 @@ func HandleTaskPage(c *fiber.Ctx) error {
 	userLoggedIn := new(models.User)
 	repos.FindUser(userLoggedIn, name.(string), database.DB.Db)
 
-	var UserTasks []models.Task
-	repos.FindUserTasks(userLoggedIn, &UserTasks, database.DB.Db)
-
-	UserTasks = repos.SortById(UserTasks)
-
-	return c.Render("taskPage", UserTasks)
+	var userResponse models.UserResponse
+	repos.FindUserTasks(userLoggedIn, &userResponse.Tasks, database.DB.Db)
+	userResponse.Tasks = repos.SortById(userResponse.Tasks)
+	return c.Render("taskPage", userResponse.Tasks)
 }
 
 func SignOut(c *fiber.Ctx) error {
@@ -48,13 +46,12 @@ func SignOut(c *fiber.Ctx) error {
 
 func AddTask(c *fiber.Ctx) error {
 
-	task_new := new(models.Task)
+	task_new := new(models.TaskDTO)
 	if err := c.BodyParser(task_new); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
-
 	sess, err := database.Store.Get(c)
 	if err != nil {
 		panic(err)
@@ -68,22 +65,28 @@ func AddTask(c *fiber.Ctx) error {
 
 	repos.FindUser(userLoggedIn, name.(string), database.DB.Db)
 
-	repos.AddTask(userLoggedIn, task_new, database.DB.Db)
+	newtask := &models.Task{Finished: task_new.Finished, Detail: task_new.Detail}
+	taskrespond := &models.TaskResponse{Finished: task_new.Finished, Detail: task_new.Detail}
+	repos.AddTask(userLoggedIn, newtask, database.DB.Db)
+	taskrespond.ID = newtask.ID
 
 	return c.JSON(fiber.Map{
 		"success": true,
-		"Task":    task_new,
+		"Task":    taskrespond,
 	})
 }
 
 func DeleteTask(c *fiber.Ctx) error {
 
-	task_del := new(models.Task)
-	if err := c.BodyParser(task_del); err != nil {
+	task_get := new(models.TaskDTO)
+	if err := c.BodyParser(task_get); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
+
+	task_del := &models.Task{Finished: task_get.Finished, Detail: task_get.Detail}
+	task_del.ID = task_get.ID
 
 	sess, err := database.Store.Get(c)
 	if err != nil {
@@ -108,12 +111,16 @@ func DeleteTask(c *fiber.Ctx) error {
 }
 
 func UpdateTask(c *fiber.Ctx) error {
-	task_up := new(models.Task)
-	if err := c.BodyParser(task_up); err != nil {
+	task_get := new(models.TaskDTO)
+	if err := c.BodyParser(task_get); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
+
+	task_up := &models.Task{Finished: task_get.Finished, Detail: task_get.Detail}
+	task_up.ID = task_get.ID
+
 	sess, err := database.Store.Get(c)
 	if err != nil {
 		panic(err)
