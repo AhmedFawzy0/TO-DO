@@ -4,6 +4,7 @@ import (
 	"github.com/AhmedFawzy0/TO-DO/database"
 	"github.com/AhmedFawzy0/TO-DO/models"
 	"github.com/AhmedFawzy0/TO-DO/repos"
+	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -27,8 +28,13 @@ func CreateUser(c *fiber.Ctx) error {
 			"UserCreated": false,
 		})
 	} else {
+		var err1 error
 		userTemp.Username = user.Username
-		userTemp.Password = user.Password
+		userTemp.Password, err1 = argon2id.CreateHash(user.Password, argon2id.DefaultParams)
+		if err1 != nil {
+			return c.SendString("failed to hash password")
+		}
+
 		_, err := repos.CreateUser(userTemp.Username, userTemp.Password, database.DB.Db)
 		if err != nil {
 			return c.JSON(fiber.Map{

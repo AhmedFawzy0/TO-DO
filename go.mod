@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387
 	github.com/gofiber/fiber/v2 v2.41.0
 	github.com/gofiber/storage/redis v0.0.0-20230131071208-04b2bc9d807c
 	github.com/gofiber/template v1.7.3

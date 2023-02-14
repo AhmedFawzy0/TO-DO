@@ -4,14 +4,18 @@ import (
 	"sort"
 
 	"github.com/AhmedFawzy0/TO-DO/models"
+	"github.com/alexedwards/argon2id"
 	"gorm.io/gorm"
 )
 
 func LoginAuthorize(userTemp *models.User, user1 *models.UserDTO) bool {
 
-	if userTemp.Username == user1.Username && userTemp.Password == user1.Password {
+	match, err := argon2id.ComparePasswordAndHash(user1.Password, userTemp.Password)
+
+	if userTemp.Username == user1.Username && match && err == nil {
 		return true
 	}
+
 	return false
 }
 
