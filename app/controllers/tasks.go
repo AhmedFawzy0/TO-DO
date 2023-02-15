@@ -3,16 +3,17 @@ package controllers
 import (
 	"errors"
 
+	"github.com/AhmedFawzy0/TO-DO/app/middleware"
+	"github.com/AhmedFawzy0/TO-DO/app/models"
+	"github.com/AhmedFawzy0/TO-DO/app/repos"
 	"github.com/AhmedFawzy0/TO-DO/database"
-	"github.com/AhmedFawzy0/TO-DO/models"
-	"github.com/AhmedFawzy0/TO-DO/repos"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func HandleTaskPage(c *fiber.Ctx) error {
 
-	sess, err := database.Store.Get(c)
+	sess, err := middleware.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +33,7 @@ func HandleTaskPage(c *fiber.Ctx) error {
 
 func SignOut(c *fiber.Ctx) error {
 
-	sess, err := database.Store.Get(c)
+	sess, err := middleware.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +53,7 @@ func AddTask(c *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-	sess, err := database.Store.Get(c)
+	sess, err := middleware.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}
@@ -88,7 +89,7 @@ func DeleteTask(c *fiber.Ctx) error {
 	task_del := &models.Task{Finished: task_get.Finished, Detail: task_get.Detail}
 	task_del.ID = task_get.ID
 
-	sess, err := database.Store.Get(c)
+	sess, err := middleware.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}
@@ -97,9 +98,7 @@ func DeleteTask(c *fiber.Ctx) error {
 		return c.SendString("Unauthenticated, please Sign In!")
 	}
 
-	var task_temp models.Task
-
-	error := repos.TaskDelete(&task_temp, task_del.ID, database.DB.Db)
+	error := repos.TaskDelete(task_del.ID, database.DB.Db)
 
 	if errors.Is(error, gorm.ErrRecordNotFound) {
 		return errors.New("task not found")
@@ -122,7 +121,7 @@ func UpdateTask(c *fiber.Ctx) error {
 	task_up := &models.Task{Finished: task_get.Finished, Detail: task_get.Detail}
 	task_up.ID = task_get.ID
 
-	sess, err := database.Store.Get(c)
+	sess, err := middleware.Store.Get(c)
 	if err != nil {
 		panic(err)
 	}

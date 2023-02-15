@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"github.com/AhmedFawzy0/TO-DO/app/middleware"
+	"github.com/AhmedFawzy0/TO-DO/app/models"
+	"github.com/AhmedFawzy0/TO-DO/app/repos"
 	"github.com/AhmedFawzy0/TO-DO/database"
-	"github.com/AhmedFawzy0/TO-DO/models"
-	"github.com/AhmedFawzy0/TO-DO/repos"
 	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v2"
 )
@@ -64,7 +65,7 @@ func LogInLogic(c *fiber.Ctx) error {
 	repos.FindUser(userTemp, user1.Username, database.DB.Db)
 
 	if repos.LoginAuthorize(userTemp, user1) {
-		sess, err := database.Store.Get(c)
+		sess, err := middleware.Store.Get(c)
 		if err != nil {
 			panic(err)
 		}

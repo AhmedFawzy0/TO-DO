@@ -1,7 +1,7 @@
 package repos
 
 import (
-	"github.com/AhmedFawzy0/TO-DO/models"
+	"github.com/AhmedFawzy0/TO-DO/app/models"
 	"gorm.io/gorm"
 )
 
@@ -14,8 +14,8 @@ func AddTask(user *models.User, task *models.Task, db1 *gorm.DB) (err error) {
 
 }
 
-func TaskDelete(task_model *models.Task, task_id uint, db1 *gorm.DB) (err error) {
-	return db1.Delete(&task_model, task_id).Error
+func TaskDelete(task_id uint, db1 *gorm.DB) (err error) {
+	return db1.Delete(&models.Task{}, task_id).Error
 }
 
 func UpdateTask(task_up *models.Task, db1 *gorm.DB) (err error) {

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AhmedFawzy0/TO-DO/models"
+	"github.com/AhmedFawzy0/TO-DO/app/models"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/postgres"
@@ -134,28 +134,32 @@ func (s *RepoTestSuite) TestFindEmptyTasks() {
 
 func (s *RepoTestSuite) TestDeleteTask() {
 	repo := NewRepo(s.db)
-	task_model := &models.Task{}
 	task_id := uint(1)
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectQuery(regexp.QuoteMeta(`UPDATE "tasks" SET "deleted_at"=$1 WHERE "tasks"."id" = $2 AND "tasks"."deleted_at" IS NULL`)).
-		WithArgs(anyTime{}, task_id)
+	s.mock.ExpectExec(`UPDATE "tasks" SET "deleted_at"=\$1 WHERE "tasks"."id" = \$2 AND "tasks"."deleted_at" IS NULL`).
+		WithArgs(anyTime{}, task_id).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
 	s.mock.ExpectCommit()
 
-	err := TaskDelete(task_model, task_id, repo.db)
+	err := TaskDelete(task_id, repo.db)
 	s.NoError(err)
 	s.NoError(s.mock.ExpectationsWereMet())
 
 }
 
 func (s *RepoTestSuite) TestUpdateTask() {
+	//Flips the task finished status!
+
 	repo := NewRepo(s.db)
 	task_model := &models.Task{Finished: false, Detail: "run"}
 	task_model.ID = uint(0)
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectQuery(regexp.QuoteMeta(`UPDATE "tasks" SET "updated_at"=$1,"finished"=$2,"detail"=$3 WHERE id = $4 AND "tasks"."deleted_at" IS NULL`)).
-		WithArgs(anyTime{}, task_model.Finished, task_model.Detail, task_model.ID)
+	s.mock.ExpectExec(`UPDATE "tasks" SET "updated_at"=\$1,"finished"=\$2,"detail"=\$3 WHERE id = \$4 AND "tasks"."deleted_at" IS NULL`).
+		WithArgs(anyTime{}, !task_model.Finished, task_model.Detail, task_model.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 	s.mock.ExpectCommit()
 
 	err := UpdateTask(task_model, repo.db)

@@ -3,7 +3,7 @@ package repos
 import (
 	"sort"
 
-	"github.com/AhmedFawzy0/TO-DO/models"
+	"github.com/AhmedFawzy0/TO-DO/app/models"
 	"github.com/alexedwards/argon2id"
 	"gorm.io/gorm"
 )
