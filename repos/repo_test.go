@@ -132,6 +132,38 @@ func (s *RepoTestSuite) TestFindEmptyTasks() {
 	s.NoError(s.mock.ExpectationsWereMet())
 }
 
+func (s *RepoTestSuite) TestDeleteTask() {
+	repo := NewRepo(s.db)
+	task_model := &models.Task{}
+	task_id := uint(1)
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectQuery(regexp.QuoteMeta(`UPDATE "tasks" SET "deleted_at"=$1 WHERE "tasks"."id" = $2 AND "tasks"."deleted_at" IS NULL`)).
+		WithArgs(anyTime{}, task_id)
+	s.mock.ExpectCommit()
+
+	err := TaskDelete(task_model, task_id, repo.db)
+	s.NoError(err)
+	s.NoError(s.mock.ExpectationsWereMet())
+
+}
+
+func (s *RepoTestSuite) TestUpdateTask() {
+	repo := NewRepo(s.db)
+	task_model := &models.Task{Finished: false, Detail: "run"}
+	task_model.ID = uint(0)
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectQuery(regexp.QuoteMeta(`UPDATE "tasks" SET "updated_at"=$1,"finished"=$2,"detail"=$3 WHERE id = $4 AND "tasks"."deleted_at" IS NULL`)).
+		WithArgs(anyTime{}, task_model.Finished, task_model.Detail, task_model.ID)
+	s.mock.ExpectCommit()
+
+	err := UpdateTask(task_model, repo.db)
+	s.NoError(err)
+	s.NoError(s.mock.ExpectationsWereMet())
+
+}
+
 func TestRepoTestSuite(t *testing.T) {
 	suite.Run(t, new(RepoTestSuite))
 }
