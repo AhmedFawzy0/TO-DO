@@ -6,7 +6,7 @@ This is a TO-DO webapp that allows users to login/register for an account and to
 As the user is using the app, the javascript fetch API makes various calls to the backend codebase written in GO. 
 The backend has functions that deal with the user's commands using the GO fiber framework. Note that Gorm (an ORM library) and a Postgresql docker container are used to implement the database. As well it implements sessions with redis for authentication.
 
-Note: Unit tests for various functions can be found in the ```methods_test.go``` file.
+Note: Unit tests for repository functions can be found in the ```methods_test.go``` file.
 
 # To get started
 
