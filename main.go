@@ -26,7 +26,7 @@ func main() {
 	routes.SetupUserRoutes(app)
 	routes.SetupTaskRoutes(app)
 
-	app.Static("/", ".resources/assests")
+	app.Static("/", "./resources/assests")
 
 	app.Listen(":3000")
 
