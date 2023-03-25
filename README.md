@@ -17,3 +17,10 @@ Note: Unit tests for repository functions can be found in the ```repo_test.go```
 - The app should now be hosted at ```localhost:3000```
 
 Thats it!
+
+
+Interface:
+
+<img width="916" alt="image" src="https://user-images.githubusercontent.com/89322519/227745124-09802972-40f4-4240-8673-a807df41cb9b.png">
+
+<img width="950" alt="image" src="https://user-images.githubusercontent.com/89322519/227745158-80a97072-9c50-4219-8e7b-82118b16652f.png">
